@@ -7,9 +7,8 @@ import os
 
 LIST_URL = "https://www.camara.leg.br/internet/agencia/infograficos-html5/DeputadosEleitos/index.html"
 
-
 def scrape():
-    with open(os.path.join('data', 'employee_file.csv'), mode='w') as output_file:
+    with open(os.path.join('data', 'deputies_names.csv'), mode='w') as output_file:
         # Initalizing the csv output
         writer = csv.writer(output_file)
         writer.writerow(['name','party'])
