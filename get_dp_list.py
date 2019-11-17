@@ -13,6 +13,7 @@ def scrape():
         # Initalizing the csv output
         writer = csv.writer(output_file)
         writer.writerow(['name','party'])
+        # Fetching the page
         response = requests.get(LIST_URL)
         soup = BeautifulSoup(response.text, 'html.parser')
         for line in soup.findAll('tr', attrs={'class': None}):
@@ -21,6 +22,7 @@ def scrape():
             for element in line_soup.findAll('td', attrs={'class': None}):
                 deputado.append(element.get_text())
             if deputado:
+                # Writing the name and party the csv
                 writer.writerow(deputado)
                 print(deputado)
 
