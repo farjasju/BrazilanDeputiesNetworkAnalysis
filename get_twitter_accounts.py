@@ -5,19 +5,22 @@ import twitter
 from config import API_KEY, API_SECRET, ACCESS_TOKEN, TOKEN_SECRET
 
 def fetch_accounts(api):
-    with open(os.path.join('data', 'deputies_names.csv'), mode='r') as list_file:
-        reader = csv.reader(list_file)
-        with open(os.path.join('data', 'deputies_accounts.csv'), mode='w') as output_file:
-            writer = csv.writer(output_file)
-            writer.writerow(['name','party','account'])
-            for line in list_file:
-                name, party = line.strip('\n').split(',')
-                for user in api.GetUsersSearch(name):
-                    if "deputad" in user.description.lower():
-                        print(user.screen_name)
-                        print(user.description)
-                        writer.writerow([name, party, user.screen_name])
-                time.sleep(1)
+    accounts_fetched = 0
+    with open(os.path.join('data', 'accounts_raw_list.txt'), mode='w') as raw_list:
+        with open(os.path.join('data', 'deputies_names.csv'), mode='r') as list_file:
+            reader = csv.reader(list_file)
+            with open(os.path.join('data', 'deputies_accounts.csv'), mode='w') as output_file:
+                writer = csv.writer(output_file)
+                writer.writerow(['name','party','account'])
+                for line in list_file:
+                    name, party = line.strip('\n').split(',')
+                    for user in api.GetUsersSearch(name):
+                        if "deputad" in user.description.lower():
+                            accounts_fetched += 1
+                            raw_list.write('"@' + user.screen_name + '",' + '\n')
+                            writer.writerow([name, party, user.screen_name])
+                            print("Number of accounts found:", accounts_fetched)
+                    time.sleep(1)
 
 def main(api):
     fetch_accounts(api)
