@@ -33,6 +33,8 @@ def progressBar(value, endvalue, bar_length=50):
     sys.stdout.write("\rPercent: [{0}] {1}%".format(
         arrow + spaces, int(round(percent * 100))))
     sys.stdout.flush()
+    if value == endvalue:
+        print('\n')
 
 
 def tweets_to_list_of_words(tweets, stemming=True):
@@ -80,7 +82,7 @@ def main():
         with open(os.path.join(DATA_DIR, filename), 'r') as f:
             tweets = json.load(f)
             words = tweets_to_list_of_words(tweets, stemming=False)
-            common_words = most_common_words(words, nb=50)
+            common_words = most_common_words(words, nb=100)
         #     with open(os.path.join(OUT_DIR, filename.split('.')[0] + '.csv'), 'w') as csv_file:
         #         writer = csv.writer(csv_file)
         #         writer.writerow(
@@ -89,7 +91,10 @@ def main():
         #             writer.writerow(word)
         progressBar(file_num, nb_deputies, bar_length=50)
         common_dict += common_words
-    print(most_common_words(common_dict, 100))
+    print(most_common_words(common_dict, 400))
+    with open(os.path.join('data', 'common_dict.txt'), 'w') as f:
+        for item in most_common_words(common_dict, 400):
+            f.write("%s\n" % item)
 
 
 if __name__ == '__main__':

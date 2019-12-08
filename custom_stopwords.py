@@ -1,1 +1,1 @@
-custom_stopwords = ['``', "''", "…", "...", "rt"]
+custom_stopwords = ['``', "''", "…", "...", "rt", '”', 'p/', '“', 'r']
