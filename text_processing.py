@@ -4,6 +4,7 @@ import os
 import json
 import re
 import csv
+import sys
 from collections import defaultdict
 
 from string import punctuation, digits
@@ -21,6 +22,17 @@ DATA_DIR = os.path.join('data', 'deputies_tweets')
 OUT_DIR = os.path.join('data', 'deputies_words')
 
 START_YEAR = 2015
+
+
+def progressBar(value, endvalue, bar_length=50):
+
+    percent = float(value) / endvalue
+    arrow = '-' * int(round(percent * bar_length)-1) + '>'
+    spaces = ' ' * (bar_length - len(arrow))
+
+    sys.stdout.write("\rPercent: [{0}] {1}%".format(
+        arrow + spaces, int(round(percent * 100))))
+    sys.stdout.flush()
 
 
 def tweets_to_list_of_words(tweets, stemming=True):
@@ -57,10 +69,14 @@ def most_common_words(words, nb=50):
 
 def main():
     common_dict = []
+    nb_deputies = sum([len(files) for r, d, files in os.walk(DATA_DIR)])
+
     if not os.path.exists(OUT_DIR):
         os.mkdir(OUT_DIR)
 
+    file_num = 0
     for filename in os.listdir(DATA_DIR):
+        file_num += 1
         with open(os.path.join(DATA_DIR, filename), 'r') as f:
             tweets = json.load(f)
             words = tweets_to_list_of_words(tweets, stemming=False)
@@ -71,8 +87,9 @@ def main():
         #             ['word', 'frequency'])
         #         for word in meaningful_words:
         #             writer.writerow(word)
-        print(filename, "processed.")
+        progressBar(file_num, nb_deputies, bar_length=50)
         common_dict += common_words
+    print(most_common_words(common_dict, 100))
 
 
 if __name__ == '__main__':
