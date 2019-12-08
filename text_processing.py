@@ -13,6 +13,8 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 
+from custom_stopwords import custom_stopwords
+
 content = "Boa notícia: 🇧🇷 e 🇩🇪 firmam acordo de 40 milhões de euros para apoiar agropecuária sustentável. Os recursos serão destinados a iniciativas relacionadas à bioeconomia, inovação das cadeias produtivas na Amazônia e implementação do Cadastro Ambiental Rural."
 
 DATA_DIR = os.path.join('data', 'deputies_tweets')
@@ -36,7 +38,7 @@ def tokenize(text, stemming=True):
     table = str.maketrans('', '', punctuation)
     stripped = [w.translate(table) for w in words]  # Removing ponctuation
     stopwords_pt = set(stopwords.words('portuguese') +
-                       list(punctuation) + list(digits))
+                       list(punctuation) + list(digits) + custom_stopwords)
     if stemming:
         stemmer = nltk.stem.RSLPStemmer()
         words_without_stopwords = [
@@ -47,12 +49,14 @@ def tokenize(text, stemming=True):
     return words_without_stopwords
 
 
-def most_important_words(words, nb=50):
+def most_common_words(words, nb=50):
     fdist = FreqDist(words)
-    return fdist.most_common(nb)
+    most_common = fdist.most_common(nb)
+    return [word[0] for word in most_common]
 
 
 def main():
+    common_dict = []
     if not os.path.exists(OUT_DIR):
         os.mkdir(OUT_DIR)
 
@@ -60,15 +64,15 @@ def main():
         with open(os.path.join(DATA_DIR, filename), 'r') as f:
             tweets = json.load(f)
             words = tweets_to_list_of_words(tweets, stemming=False)
-            meaningful_words = most_important_words(words, nb=50)
-            print(meaningful_words)
+            common_words = most_common_words(words, nb=50)
         #     with open(os.path.join(OUT_DIR, filename.split('.')[0] + '.csv'), 'w') as csv_file:
         #         writer = csv.writer(csv_file)
         #         writer.writerow(
         #             ['word', 'frequency'])
         #         for word in meaningful_words:
         #             writer.writerow(word)
-        # print(filename, "processed.")
+        print(filename, "processed.")
+        common_dict += common_words
 
 
 if __name__ == '__main__':
