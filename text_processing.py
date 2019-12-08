@@ -33,6 +33,8 @@ def tweets_to_list_of_words(tweets, stemming=True):
 
 def tokenize(text, stemming=True):
     words = word_tokenize(text.lower())
+    table = str.maketrans('', '', punctuation)
+    stripped = [w.translate(table) for w in words]  # Removing ponctuation
     stopwords_pt = set(stopwords.words('portuguese') +
                        list(punctuation) + list(digits))
     if stemming:
