@@ -14,9 +14,8 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 
-from custom_stopwords import custom_stopwords
+from custom_stopwords import custom_stopwords, useless_words
 
-content = "Boa notícia: 🇧🇷 e 🇩🇪 firmam acordo de 40 milhões de euros para apoiar agropecuária sustentável. Os recursos serão destinados a iniciativas relacionadas à bioeconomia, inovação das cadeias produtivas na Amazônia e implementação do Cadastro Ambiental Rural."
 
 DATA_DIR = os.path.join('data', 'deputies_tweets')
 OUT_DIR = os.path.join('data', 'deputies_words')
@@ -52,7 +51,7 @@ def tokenize(text, stemming=True):
     table = str.maketrans('', '', punctuation)
     stripped = [w.translate(table) for w in words]  # Removing ponctuation
     stopwords_pt = set(stopwords.words('portuguese') +
-                       list(punctuation) + list(digits) + custom_stopwords)
+                       list(punctuation) + list(digits) + custom_stopwords + useless_words)
     if stemming:
         stemmer = nltk.stem.RSLPStemmer()
         words_without_stopwords = [
@@ -66,7 +65,7 @@ def tokenize(text, stemming=True):
 def most_common_words(words, nb=50):
     fdist = FreqDist(words)
     most_common = fdist.most_common(nb)
-    return [word[0] for word in most_common]
+    return [(word[0], word[1]) for word in most_common]
 
 
 def main():
@@ -83,18 +82,19 @@ def main():
             tweets = json.load(f)
             words = tweets_to_list_of_words(tweets, stemming=False)
             common_words = most_common_words(words, nb=100)
-        #     with open(os.path.join(OUT_DIR, filename.split('.')[0] + '.csv'), 'w') as csv_file:
-        #         writer = csv.writer(csv_file)
-        #         writer.writerow(
-        #             ['word', 'frequency'])
-        #         for word in meaningful_words:
-        #             writer.writerow(word)
+            with open(os.path.join(OUT_DIR, filename.split('.')[0] + '.csv'), 'w') as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerow(
+                    ['word', 'frequency'])
+                for word, frequency in common_words:
+                    writer.writerow([word, frequency])
+                    common_dict.append(word)
         progressBar(file_num, nb_deputies, bar_length=50)
-        common_dict += common_words
+        # common_dict += common_words
     print(most_common_words(common_dict, 400))
     with open(os.path.join('data', 'common_dict.txt'), 'w') as f:
         for item in most_common_words(common_dict, 400):
-            f.write("%s\n" % item)
+            f.write(str(item[0]) + "\n")
 
 
 if __name__ == '__main__':
