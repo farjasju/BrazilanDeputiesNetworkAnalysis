@@ -2,6 +2,7 @@ import os
 import csv
 import networkx as nx
 import math
+import numpy as np
 
 DATA_DIR = os.path.join('data', 'deputies_words')
 DICT_DIR = os.path.join('data', 'common_dict.txt')
@@ -49,6 +50,8 @@ def graph_build_gexf(dictionary, nb_dep=None, graph_filename=GEXF_GRAPH_DIR, dep
         nb_dep = nb_files
     else:
         nb_files = nb_dep
+    if not dep_words:
+        dep_words = nb_words
     for filename in os.listdir(DATA_DIR):
         file_num += 1
         if file_num <= nb_dep:
@@ -74,12 +77,25 @@ def graph_build_gexf(dictionary, nb_dep=None, graph_filename=GEXF_GRAPH_DIR, dep
                                 added_words.add(target)
                             G.add_edge(source, target, weight=weight)
     nx.write_gexf(G, graph_filename)
+    return G
+
+
+def generate_adjacency_matrix(G, dictionary):
+    # for node in list(G):
+    #     if nx.get_node_attributes(G,
+    i = 0
+    word_map = dict()
+    for i in len(dictionary):
+        word_map[dictionary[i]] = i
+    for i in len(list(G)):
+
+    print(nx.get_node_attributes(G, 'id'))
 
 
 def main():
-    dictionary = load_dict(size=30)
-    graph_build_gexf(dictionary, nb_dep=10, dep_words=10,
-                     graph_filename='data/very_small_graph.gexf')
+    dictionary = load_dict()
+    G = graph_build_gexf(dictionary)
+    generate_adjacency_matrix(G, dictionary)
 
 
 if __name__ == '__main__':
