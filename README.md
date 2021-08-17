@@ -1,7 +1,3 @@
 # Analyzing the similarity of content between the tweets of Brazilian deputies
 
-## Extracting the data
-
-## Processing the text content of the tweets
-
- 
+[🎥 Video explaining the process and showing the results](https://www.youtube.com/watch?v=3RPbbfAEl88)
